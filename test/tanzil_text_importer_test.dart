@@ -30,7 +30,7 @@ String fixtureMetadata() {
   ${chapters.join('\n')}
   <page index="1" sura="1" aya="1" />
   <juz index="1" sura="1" aya="1" />
-  <hizb index="1" sura="1" aya="1" />
+  <quarter index="1" sura="1" aya="1" />
 </quran>
 ''';
 }
