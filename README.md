@@ -26,18 +26,13 @@ See [implementation status](docs/implementation-status.md) for the current check
 
 Install the current stable Flutter SDK and the platform tools described in the [Flutter installation guide](https://docs.flutter.dev/get-started/install).
 
-From the repository root:
+From the repository root, generate missing native platform scaffolding first:
 
 ```bash
 flutter doctor
+bash tool/bootstrap-platforms.sh
 flutter pub get
 flutter run
-```
-
-To generate any missing official platform scaffolding without overwriting existing platform directories:
-
-```bash
-bash tool/bootstrap-platforms.sh
 ```
 
 Then run checks:
