@@ -13,12 +13,13 @@ This repository is being built incrementally. A visible UI shell is not the same
 - [x] Installer integrity, tamper rejection, and failed-update tests
 - [x] No GitHub Actions/workflow files; verification is run manually with Flutter CLI commands
 - [ ] Generate and commit official Android, Linux, macOS, and Windows scaffolding
-- [x] Local JSON manifest/payload import UI for the primary Quran text pack
-- [ ] Run formatter, analyzer, and tests locally on the latest revision
+- [x] Guided first-run Tanzil import for Uthmani, Simple, and metadata source files
+- [x] Preserve original Tanzil source files and license notice verbatim in local app storage
+- [ ] Run formatter, analyzer, and tests locally on the latest revision (Tanzil importer tests added; not yet executed locally)
 
 ## Reader
 
-- [ ] Select and review a canonical Arabic text source and version
+- [x] Select and document Tanzil Quran text version 1.1 and metadata version 1.0; retain official source and license notices
 - [x] Build a resource-pack manifest and verifier
 - [x] Load an integrity-checked active text pack and display Arabic verses
 - [x] Add Uthmani/simplified variant selection
@@ -30,7 +31,7 @@ This repository is being built incrementally. A visible UI shell is not the same
 
 - [ ] Local database and migrations
 - [ ] Bookmarks, notes, highlights, and reading plans
-- [ ] Network download manager and progress UI (installer integrity and rollback-safe activation implemented)
+- [ ] Optional in-app network downloader and progress UI (first-run setup currently uses official user downloads)
 - [ ] Audio playback and verse synchronization
 - [ ] Tafsir, tajweed display, and word-level audio
 - [ ] Backup/restore and accessibility pass
