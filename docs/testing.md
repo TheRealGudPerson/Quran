@@ -1,12 +1,12 @@
 # Testing strategy
 
-## Required CI checks
+## Manual checks
 
 - `dart format --output=none --set-exit-if-changed .`
 - `flutter analyze`
 - `flutter test`
 - Resource-manifest schema validation and checksum verification when resource packs are added.
-- Platform build checks on supported runners after Flutter platform scaffolding has been generated.
+- Build each target manually on its supported operating system after generating native platform scaffolding.
 
 ## Test layers
 
