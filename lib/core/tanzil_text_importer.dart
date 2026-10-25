@@ -146,6 +146,8 @@ Quran metadata (surah names, pages, juz and hizb-quarter boundaries): Tanzil Pro
       'source': {
         'name': sourceName,
         'version': sourceVersion,
+        'metadataVersion': '1.0',
+        'metadataUrl': metadataUrl.toString(),
         'url': sourceUrl.toString(),
       },
       'chapters': chapters,
