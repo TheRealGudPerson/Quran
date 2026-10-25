@@ -7,8 +7,8 @@ void main() {
     await tester.pumpWidget(const QuranReaderApp());
 
     expect(find.text('Quran Reader'), findsOneWidget);
-    expect(find.text('Reader setup is in progress'), findsOneWidget);
-    expect(find.textContaining('No Quran dataset is bundled yet.'), findsOneWidget);
+    expect(find.text('Your reader is ready for its first text pack'), findsOneWidget);
+    expect(find.textContaining('No verified Quran text is installed yet.'), findsOneWidget);
   });
 
   testWidgets('settings screen exposes theme choices', (tester) async {
