@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/quran_text_pack.dart';
 import '../core/quran_text_repository.dart';
 import '../core/resource_pack_installer.dart';
+import '../core/tanzil_text_importer.dart';
 
 class QuranReaderPage extends StatefulWidget {
   const QuranReaderPage({super.key});
@@ -112,6 +114,54 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
         }
       }
     }
+  }
+
+  Future<void> _showSourceInfo(QuranTextPack pack) async {
+    final isTanzil = pack.sourceName == TanzilTextImporter.sourceName;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Text source and license'),
+        content: SizedBox(
+          width: 560,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(pack.sourceName, style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 4),
+                Text('Edition: ${pack.sourceVersion}'),
+                SelectableText(pack.sourceUrl.toString()),
+                if (isTanzil) ...[
+                  const SizedBox(height: 16),
+                  const SelectableText(TanzilTextImporter.attribution),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'The Uthmani and Simple strings are retained as supplied by Tanzil. The app does not normalize or rewrite the verse text.',
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final url = isTanzil
+                  ? TanzilTextImporter.licenseUrl
+                  : pack.sourceUrl;
+              await launchUrl(url, mode: LaunchMode.externalApplication);
+            },
+            child: Text(isTanzil ? 'Open Tanzil license' : 'Open source'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _reload() {
@@ -353,6 +403,11 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
                   Text(
                     '${chapter.nameTransliteration} · ${chapter.verseCount} verses',
                     style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _showSourceInfo(pack),
+                    icon: const Icon(Icons.info_outline, size: 18),
+                    label: const Text('Text source and license'),
                   ),
                 ],
               ),
