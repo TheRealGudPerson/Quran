@@ -84,8 +84,10 @@ class ResourcePackInstaller {
       final installedManifest = ResourcePackManifest.decode(
         await manifestFile.readAsString(),
       );
-      if (jsonEncode(_manifestToJson(installedManifest)) !=
-          jsonEncode(_manifestToJson(manifest))) {
+      final installedMetadata = _manifestToJson(installedManifest)
+        ..remove('retrievedAt');
+      final requestedMetadata = _manifestToJson(manifest)..remove('retrievedAt');
+      if (jsonEncode(installedMetadata) != jsonEncode(requestedMetadata)) {
         throw const ResourcePackInstallException(
           'A different payload or manifest is already installed with this version number.',
         );
