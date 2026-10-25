@@ -16,6 +16,7 @@ class TanzilPreparedPack {
     required this.uthmaniSourceBytes,
     required this.simpleSourceBytes,
     required this.metadataSourceBytes,
+    required this.licenseNoticeBytes,
   });
 
   final ResourcePackManifest manifest;
@@ -23,6 +24,7 @@ class TanzilPreparedPack {
   final Uint8List uthmaniSourceBytes;
   final Uint8List simpleSourceBytes;
   final Uint8List metadataSourceBytes;
+  final Uint8List licenseNoticeBytes;
 }
 
 class TanzilImportException implements Exception {
@@ -68,13 +70,7 @@ Updates: https://tanzil.net/updates/
     8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6,
   ];
 
-  static const _tanzilTextCopyright = '''
-Tanzil Quran Text
-Copyright (C) 2007-2021 Tanzil Project
-License: Creative Commons Attribution 3.0
-Source: https://tanzil.net/
-License terms: https://tanzil.net/docs/Text_License
-''';
+  static const _tanzilTextCopyright = attribution;
 
   TanzilPreparedPack prepare({
     required List<int> uthmaniBytes,
@@ -192,6 +188,7 @@ License terms: https://tanzil.net/docs/Text_License
       uthmaniSourceBytes: uthmaniSource,
       simpleSourceBytes: simpleSource,
       metadataSourceBytes: metadataSource,
+      licenseNoticeBytes: Uint8List.fromList(utf8.encode(_tanzilTextCopyright)),
     );
   }
 
