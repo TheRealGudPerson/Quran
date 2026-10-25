@@ -2,14 +2,17 @@
 
 This document is a release gate, not a claim that any resource has already been approved for redistribution.
 
-## Candidate sources
+## Integrated source: Arabic Quran text and structural metadata
 
-### Arabic Quran text: Tanzil
+### Tanzil Project
 
 - Project: https://tanzil.net/
 - Text license: https://tanzil.net/docs/Text_License
-- Candidate use: versioned Arabic text after reviewing current terms, preserving required attribution, and validating the downloaded edition.
-- Rule: do not modify the source text. Any alternate script representation must have its own documented source and validation.
+- Implemented first-run import: Uthmani text, Simple/Imla'ei text, and official `quran-data.xml` metadata, all downloaded by the user from the official Tanzil sources.
+- The importer validates the 114-surah/6,236-ayah structure, per-surah counts, source metadata, and page/juz/hizb boundaries.
+- Original downloaded source bytes are retained unchanged in local app storage alongside the required text and metadata attribution.
+- The internal reader payload preserves each source verse string without Unicode normalization or text rewriting. Uthmani and Simple are separately sourced editions, not generated conversions.
+- The source text is not bundled in the repository or installer.
 
 ### Quran Foundation / Quran.com APIs
 
@@ -20,6 +23,10 @@ This document is a release gate, not a claim that any resource has already been 
 - Rule: QF content may be displayed inside the application under its terms, but raw QF content must not be redistributed as a separate dataset or content package without the required written license.
 - Rule: if a resource is available through Content Sync, use Content Sync as the only permitted way to obtain and maintain its offline copy. Sync at least every 7 days when connectivity permits, apply available changes, and sync promptly after connectivity returns.
 - Rule: Content Sync's storage exception does not itself permit prepackaging a QF content database in the installer. Offline support must be implemented in accordance with the current terms.
+
+## Future sources: translations, tafsir, and recitation
+
+Translations, tafsir, transliteration, fonts, and recitations are not included in the current first-run import. Each must have its own edition-specific license and attribution review before integration. Do not assume Tanzil's Arabic text license also covers its translations or audio.
 
 ## Required metadata per resource
 
