@@ -55,6 +55,7 @@ See [data sources and licensing](docs/data-sources-and-licensing.md) before addi
 
 - [Architecture](docs/architecture.md)
 - [Data sources and licensing](docs/data-sources-and-licensing.md)
+- [Resource pack format](docs/resource-pack-format.md)
 - [Testing strategy](docs/testing.md)
 - [Cross-platform releases](docs/releases.md)
 - [Implementation status](docs/implementation-status.md)
