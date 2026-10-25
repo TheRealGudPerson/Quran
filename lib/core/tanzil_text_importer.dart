@@ -72,8 +72,6 @@ Quran metadata (surah names, pages, juz and hizb-quarter boundaries): Tanzil Pro
     8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6,
   ];
 
-  static const _tanzilTextCopyright = attribution;
-
   TanzilPreparedPack prepare({
     required List<int> uthmaniBytes,
     required List<int> simpleBytes,
@@ -190,7 +188,7 @@ Quran metadata (surah names, pages, juz and hizb-quarter boundaries): Tanzil Pro
       uthmaniSourceBytes: uthmaniSource,
       simpleSourceBytes: simpleSource,
       metadataSourceBytes: metadataSource,
-      licenseNoticeBytes: Uint8List.fromList(utf8.encode(_tanzilTextCopyright)),
+      licenseNoticeBytes: Uint8List.fromList(utf8.encode(attribution)),
     );
   }
 
@@ -202,7 +200,7 @@ Quran metadata (surah names, pages, juz and hizb-quarter boundaries): Tanzil Pro
       if (lineIndex == 0 && line.startsWith('\uFEFF')) {
         line = line.substring(1); // UTF-8 BOM is a file marker, not verse text.
       }
-      if (line.trim().isEmpty || line.startsWith('#')) continue;
+      if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
       final firstSeparator = line.indexOf('|');
       final secondSeparator = firstSeparator < 0
           ? -1
