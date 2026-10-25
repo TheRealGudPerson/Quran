@@ -23,7 +23,7 @@ This repository is being built incrementally. A visible UI shell is not the same
 - [x] Load an integrity-checked active text pack and display Arabic verses
 - [x] Add Uthmani/simplified variant selection
 - [x] Display available translation and transliteration layers from an installed text pack
-- [ ] Add surah, ayah, juz, hizb, and page navigation
+- [x] Add surah, ayah, juz, hizb, and page navigation
 - [ ] Add local search and reading-position persistence
 
 ## Study and audio
