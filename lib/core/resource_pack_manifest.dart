@@ -16,7 +16,7 @@ class ResourcePackValidationException implements Exception {
   final String message;
 
   @override
-  String toString() => 'ResourcePackValidationException: ${message}';
+  String toString() => 'ResourcePackValidationException: $message';
 }
 
 class ResourceLicense {
