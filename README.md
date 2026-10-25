@@ -6,7 +6,7 @@ A cross-platform Quran reading and study application built with Flutter and Dart
 
 The project foundation is in progress on `feature/flutter-quran-reader`. The current commit includes a responsive UI shell, theme controls, architecture and licensing documentation, Quran catalog and text-pack validators, a checksum-verifying resource-pack installer with versioned activation and rollback safety, a local JSON pack-import screen, and a reader view with Uthmani/simplified script switching plus translation/transliteration display. The repository intentionally contains no GitHub Actions workflows.
 
-**This is not yet a functional Quran reader.** No Quran text, translations, tafsir, recitations, or fonts are bundled yet. The app intentionally does not invent or silently transform sacred text while the source edition and redistribution terms are being verified.
+**This is not yet a complete reader.** The reader can display an installed, verified text pack, but no Quran text, translations, tafsir, recitations, or fonts are bundled yet. The app intentionally does not invent or silently transform sacred text while the source edition and redistribution terms are being verified.
 
 See [implementation status](docs/implementation-status.md) for the current checklist.
 
