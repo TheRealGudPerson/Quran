@@ -84,6 +84,13 @@ class ResourcePackInstaller {
       final installedManifest = ResourcePackManifest.decode(
         await manifestFile.readAsString(),
       );
+      final existingBytes = await payloadFile.readAsBytes();
+      if (sha256.convert(existingBytes).toString() != manifest.sha256 ||
+          !_bytesEqual(existingBytes, bytes)) {
+        throw const ResourcePackInstallException(
+          'The existing resource version payload is corrupt or differs from the requested payload.',
+        );
+      }
       final installedMetadata = _manifestToJson(installedManifest)
         ..remove('retrievedAt');
       final requestedMetadata = _manifestToJson(manifest)..remove('retrievedAt');
@@ -245,6 +252,14 @@ class ResourcePackInstaller {
     } finally {
       if (await temporaryFile.exists()) await temporaryFile.delete();
     }
+  }
+
+  bool _bytesEqual(List<int> left, List<int> right) {
+    if (left.length != right.length) return false;
+    for (var index = 0; index < left.length; index++) {
+      if (left[index] != right[index]) return false;
+    }
+    return true;
   }
 
   void _validatePathSegment(String value, String label) {
