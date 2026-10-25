@@ -16,7 +16,10 @@ This document is a release gate, not a claim that any resource has already been 
 - API documentation: https://api-docs.quran.com/docs/api-reference/
 - Content sync documentation: https://api-docs.quran.com/docs/tutorials/content-sync/getting-started/
 - Candidate use: discover available translations, tafsir, recitations, word-level data, and supported offline synchronization.
-- Rule: check current API terms and the license of each individual resource. API availability alone does not grant redistribution rights.
+- Current developer terms: https://api-docs.quran.com/legal/developer-terms/
+- Rule: QF content may be displayed inside the application under its terms, but raw QF content must not be redistributed as a separate dataset or content package without the required written license.
+- Rule: if a resource is available through Content Sync, use Content Sync as the only permitted way to obtain and maintain its offline copy. Sync at least every 7 days when connectivity permits, apply available changes, and sync promptly after connectivity returns.
+- Rule: Content Sync's storage exception does not itself permit prepackaging a QF content database in the installer. Offline support must be implemented in accordance with the current terms.
 
 ## Required metadata per resource
 
