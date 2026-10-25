@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'reader/downloads_page.dart';
 import 'reader/quran_reader_page.dart';
 
 void main() {
@@ -177,13 +178,7 @@ class _QuranHomePageState extends State<QuranHomePage> {
             description:
                 'Bookmarks, notes, highlights, reading plans, and memorization progress will live here.',
           ),
-        ReaderSection.downloads => const _FeatureLanding(
-            key: ValueKey('downloads'),
-            icon: Icons.cloud_download_rounded,
-            title: 'Offline library',
-            description:
-                'Manage verified Quran text, translations, tafsir, fonts, and recitation packs. Resources will be enabled only after their source and license are verified.',
-          ),
+        ReaderSection.downloads => const DownloadsPage(key: ValueKey('downloads')),
         ReaderSection.settings => _SettingsPage(
             key: const ValueKey('settings'),
             themeMode: widget.themeMode,
