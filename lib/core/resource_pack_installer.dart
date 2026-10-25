@@ -180,11 +180,7 @@ class ResourcePackInstaller {
   }
 
   void _validatePayload(ResourcePackManifest manifest, Uint8List bytes) {
-    if (payloadValidator != null) {
-      payloadValidator!(manifest, bytes);
-      return;
-    }
-
+    payloadValidator?.call(manifest, bytes);
     if (manifest.kind != QuranResourceKind.quranText) return;
     try {
       final decoded = jsonDecode(utf8.decode(bytes));
@@ -221,6 +217,12 @@ class ResourcePackInstaller {
       '${resourceDirectory.path}/.active-${DateTime.now().microsecondsSinceEpoch}.tmp',
     );
     final backupFile = File('${resourceDirectory.path}/.active-backup.tmp');
+
+    if (!await activeFile.exists() && await backupFile.exists()) {
+      await backupFile.rename(activeFile.path);
+    } else if (await activeFile.exists() && await backupFile.exists()) {
+      await backupFile.delete();
+    }
 
     await temporaryFile.writeAsString(
       jsonEncode({'version': version}),
