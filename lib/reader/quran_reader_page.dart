@@ -19,6 +19,7 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
   int _chapterNumber = 1;
   String? _pendingVerseId;
   final Map<String, GlobalKey> _verseKeys = {};
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -32,6 +33,12 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
       installer: ResourcePackInstaller(rootDirectory: supportDirectory),
     );
     return repository.loadActivePack();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _goToVerse(int chapterNumber, int verseNumber) {
@@ -183,9 +190,28 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
         if (_pendingVerseId != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted || _pendingVerseId == null) return;
-            final key = _verseKeys[_pendingVerseId!];
-            final targetContext = key?.currentContext;
-            if (targetContext != null) {
+            final targetId = _pendingVerseId!;
+            var targetContext = _verseKeys[targetId]?.currentContext;
+            if (targetContext == null && _scrollController.hasClients) {
+              final targetIndex =
+                  chapter.verses.indexWhere((verse) => verse.id == targetId);
+              if (targetIndex >= 0) {
+                final maxExtent = _scrollController.position.maxScrollExtent;
+                final estimatedOffset =
+                    (targetIndex * 260.0).clamp(0.0, maxExtent);
+                _scrollController.jumpTo(estimatedOffset);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final builtContext = _verseKeys[targetId]?.currentContext;
+                  if (builtContext != null) {
+                    Scrollable.ensureVisible(
+                      builtContext,
+                      duration: const Duration(milliseconds: 250),
+                      alignment: 0.1,
+                    );
+                  }
+                });
+              }
+            } else if (targetContext != null) {
               Scrollable.ensureVisible(
                 targetContext,
                 duration: const Duration(milliseconds: 250),
@@ -334,6 +360,7 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
             const Divider(height: 1),
             Expanded(
               child: ListView.separated(
+                controller: _scrollController,
                 key: PageStorageKey<int>(chapter.number),
                 padding: const EdgeInsets.all(20),
                 itemCount: chapter.verses.length,
