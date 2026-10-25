@@ -1,9 +1,6 @@
 name: Cross-platform builds
 
 on:
-  push:
-    branches:
-      - feature/flutter-quran-reader
   pull_request:
   workflow_dispatch:
 
