@@ -54,7 +54,6 @@ ThemeData _buildTheme(Brightness brightness, Color seedColor) {
     brightness: brightness,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     scaffoldBackgroundColor: scheme.surface,
-    cardTheme: const CardThemeData(clipBehavior: Clip.antiAlias),
   );
 }
 
@@ -392,7 +391,7 @@ class _SettingsPage extends StatelessWidget {
                   spacing: 12,
                   runSpacing: 12,
                   children: _colors.map((color) {
-                    final selected = color.toARGB32() == seedColor.toARGB32();
+                    final selected = color == seedColor;
                     return Semantics(
                       button: true,
                       selected: selected,
