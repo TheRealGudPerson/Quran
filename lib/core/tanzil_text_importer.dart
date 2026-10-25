@@ -294,7 +294,13 @@ Updates: https://tanzil.net/updates/
 
     final pages = readBoundaries('page');
     final juzs = readBoundaries('juz');
-    final hizbs = readBoundaries('hizb');
+    final hizbs = readBoundaries('quarter')
+        .map((boundary) => _Boundary(
+              number: ((boundary.number + 3) ~/ 4),
+              chapterNumber: boundary.chapterNumber,
+              verseNumber: boundary.verseNumber,
+            ))
+        .toList();
     return {
       'chapters': chapters,
       'pages': pages,
