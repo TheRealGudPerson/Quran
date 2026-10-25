@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'reader/quran_reader_page.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const QuranReaderApp());
@@ -167,7 +169,7 @@ class _QuranHomePageState extends State<QuranHomePage> {
   }
 
   Widget _buildSection() => switch (_section) {
-        ReaderSection.reader => const _ReaderLanding(key: ValueKey('reader')),
+        ReaderSection.reader => const QuranReaderPage(key: ValueKey('reader')),
         ReaderSection.study => const _FeatureLanding(
             key: ValueKey('study'),
             icon: Icons.bookmarks_rounded,
@@ -190,108 +192,6 @@ class _QuranHomePageState extends State<QuranHomePage> {
             onSeedColorChanged: widget.onSeedColorChanged,
           ),
       };
-}
-
-class _ReaderLanding extends StatelessWidget {
-  const _ReaderLanding({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 720),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [scheme.primaryContainer, scheme.surfaceContainerHighest],
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.menu_book_rounded,
-                        size: 42, color: scheme.onPrimaryContainer),
-                    const SizedBox(height: 20),
-                    Text(
-                      'A quieter place to read and reflect.',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Built for careful Quran reading, study, and offline access across your devices.',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              const _StatusCard(),
-              const SizedBox(height: 20),
-              Text('Planned reader tools',
-                  style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 12),
-              const Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _FeatureChip(label: 'Uthmani + simplified script'),
-                  _FeatureChip(label: 'Multiple translations'),
-                  _FeatureChip(label: 'Transliteration + tafsir'),
-                  _FeatureChip(label: 'Verse-synced recitation'),
-                  _FeatureChip(label: 'Tajweed + word audio'),
-                  _FeatureChip(label: 'Local backups'),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusCard extends StatelessWidget {
-  const _StatusCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.verified_user_outlined, color: scheme.primary, size: 28),
-            const SizedBox(width: 14),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Reader setup is in progress',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
-                  SizedBox(height: 6),
-                  Text(
-                    'No Quran dataset is bundled yet. Text and study resources will be enabled only after their source, integrity, and redistribution terms are checked.',
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class _FeatureLanding extends StatelessWidget {
