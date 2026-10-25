@@ -5,8 +5,11 @@
 - `dart format --output=none --set-exit-if-changed .`
 - `flutter analyze`
 - `flutter test`
-- Resource-manifest schema validation and checksum verification when resource packs are added.
+- Tanzil importer tests for the 114-surah/6,236-ayah count table, source-string preservation, metadata boundaries, missing verses, and duplicate records.
+- Resource-manifest schema validation and checksum verification.
+- Resource installer tests for tampering, interrupted-update recovery, repeated identical imports, and corrupt existing versions.
 - Build each target manually on its supported operating system after generating native platform scaffolding.
+- No GitHub Actions workflows are used. Run these commands locally; do not infer success from a prior revision's results.
 
 ## Test layers
 
