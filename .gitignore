@@ -1,0 +1,31 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Signing keys and local configuration
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+key.properties
+secrets/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Downloaded resource packs and personal data must not be committed
+.local_data/
+resource_packs/
+backups/

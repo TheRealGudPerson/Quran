@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/quran_text_pack.dart';
 import '../core/quran_text_repository.dart';
 import '../core/resource_pack_installer.dart';
+import '../core/tanzil_text_importer.dart';
 
 class QuranReaderPage extends StatefulWidget {
   const QuranReaderPage({super.key});
@@ -19,6 +21,7 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
   int _chapterNumber = 1;
   String? _pendingVerseId;
   final Map<String, GlobalKey> _verseKeys = {};
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -32,6 +35,12 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
       installer: ResourcePackInstaller(rootDirectory: supportDirectory),
     );
     return repository.loadActivePack();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _goToVerse(int chapterNumber, int verseNumber) {
@@ -105,6 +114,54 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
         }
       }
     }
+  }
+
+  Future<void> _showSourceInfo(QuranTextPack pack) async {
+    final isTanzil = pack.sourceName == TanzilTextImporter.sourceName;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Text source and license'),
+        content: SizedBox(
+          width: 560,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(pack.sourceName, style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 4),
+                Text('Edition: ${pack.sourceVersion}'),
+                SelectableText(pack.sourceUrl.toString()),
+                if (isTanzil) ...[
+                  const SizedBox(height: 16),
+                  const SelectableText(TanzilTextImporter.attribution),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'The Uthmani and Simple strings are retained as supplied by Tanzil. The app does not normalize or rewrite the verse text.',
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final url = isTanzil
+                  ? TanzilTextImporter.licenseUrl
+                  : pack.sourceUrl;
+              await launchUrl(url, mode: LaunchMode.externalApplication);
+            },
+            child: Text(isTanzil ? 'Open Tanzil license' : 'Open source'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _reload() {
@@ -183,9 +240,28 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
         if (_pendingVerseId != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted || _pendingVerseId == null) return;
-            final key = _verseKeys[_pendingVerseId!];
-            final targetContext = key?.currentContext;
-            if (targetContext != null) {
+            final targetId = _pendingVerseId!;
+            var targetContext = _verseKeys[targetId]?.currentContext;
+            if (targetContext == null && _scrollController.hasClients) {
+              final targetIndex =
+                  chapter.verses.indexWhere((verse) => verse.id == targetId);
+              if (targetIndex >= 0) {
+                final maxExtent = _scrollController.position.maxScrollExtent;
+                final estimatedOffset =
+                    (targetIndex * 260.0).clamp(0.0, maxExtent);
+                _scrollController.jumpTo(estimatedOffset);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final builtContext = _verseKeys[targetId]?.currentContext;
+                  if (builtContext != null) {
+                    Scrollable.ensureVisible(
+                      builtContext,
+                      duration: const Duration(milliseconds: 250),
+                      alignment: 0.1,
+                    );
+                  }
+                });
+              }
+            } else if (targetContext != null) {
               Scrollable.ensureVisible(
                 targetContext,
                 duration: const Duration(milliseconds: 250),
@@ -328,12 +404,18 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
                     '${chapter.nameTransliteration} · ${chapter.verseCount} verses',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
+                  TextButton.icon(
+                    onPressed: () => _showSourceInfo(pack),
+                    icon: const Icon(Icons.info_outline, size: 18),
+                    label: const Text('Text source and license'),
+                  ),
                 ],
               ),
             ),
             const Divider(height: 1),
             Expanded(
               child: ListView.separated(
+                controller: _scrollController,
                 key: PageStorageKey<int>(chapter.number),
                 padding: const EdgeInsets.all(20),
                 itemCount: chapter.verses.length,
