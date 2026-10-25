@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_reader/main.dart';
 
 void main() {
-  testWidgets('shows reader setup state without unverified Quran data',
+  testWidgets('shows the reader shell before resources are installed',
       (tester) async {
     await tester.pumpWidget(const QuranReaderApp());
 
