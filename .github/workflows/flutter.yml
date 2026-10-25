@@ -1,10 +1,6 @@
 name: Flutter validation
 
 on:
-  push:
-    branches:
-      - main
-      - feature/flutter-quran-reader
   pull_request:
   workflow_dispatch:
 
