@@ -84,9 +84,10 @@ class ResourcePackInstaller {
       final installedManifest = ResourcePackManifest.decode(
         await manifestFile.readAsString(),
       );
-      if (installedManifest.sha256 != manifest.sha256) {
+      if (jsonEncode(_manifestToJson(installedManifest)) !=
+          jsonEncode(_manifestToJson(manifest))) {
         throw const ResourcePackInstallException(
-          'A different payload is already installed with this version number.',
+          'A different payload or manifest is already installed with this version number.',
         );
       }
     } else {
@@ -130,6 +131,16 @@ class ResourcePackInstaller {
     final resourceDirectory =
         Directory('${rootDirectory.path}/packs/$resourceId');
     final pointer = File('${resourceDirectory.path}/active.json');
+    final backupPointer = File('${resourceDirectory.path}/.active-backup.tmp');
+    if (!await pointer.exists() && await backupPointer.exists()) {
+      // Recover if the process stopped between moving the old pointer aside
+      // and activating the new one.
+      await backupPointer.rename(pointer.path);
+    } else if (await pointer.exists() && await backupPointer.exists()) {
+      // A valid pointer already exists; discard a leftover backup from a
+      // process that stopped after activating the new version.
+      await backupPointer.delete();
+    }
     if (!await pointer.exists()) return null;
 
     final decoded = jsonDecode(await pointer.readAsString());
@@ -153,6 +164,7 @@ class ResourcePackInstaller {
     final manifest = ResourcePackManifest.decode(
       await manifestFile.readAsString(),
     );
+    manifest.validateForInstall(bundledInInstaller: false);
     final bytes = await payloadFile.readAsBytes();
     if (sha256.convert(bytes).toString() != manifest.sha256) {
       throw const ResourcePackInstallException(
