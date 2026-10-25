@@ -17,6 +17,8 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
   String _script = 'uthmani';
   String? _translationId;
   int _chapterNumber = 1;
+  String? _pendingVerseId;
+  final Map<String, GlobalKey> _verseKeys = {};
 
   @override
   void initState() {
@@ -30,6 +32,79 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
       installer: ResourcePackInstaller(rootDirectory: supportDirectory),
     );
     return repository.loadActivePack();
+  }
+
+  void _goToVerse(int chapterNumber, int verseNumber) {
+    setState(() {
+      _chapterNumber = chapterNumber;
+      _pendingVerseId = '$chapterNumber:$verseNumber';
+    });
+  }
+
+  Future<void> _jumpToAyah() async {
+    final controller = TextEditingController();
+    final verseNumber = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Go to ayah'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Ayah number in selected surah',
+            border: OutlineInputBorder(),
+          ),
+          onSubmitted: (_) {
+            final value = int.tryParse(controller.text.trim());
+            if (value != null) Navigator.of(dialogContext).pop(value);
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text.trim());
+              if (value != null) Navigator.of(dialogContext).pop(value);
+            },
+            child: const Text('Go'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (verseNumber == null || !mounted) return;
+    final pack = await _packFuture;
+    if (pack == null ||
+        _chapterNumber < 1 ||
+        _chapterNumber > pack.chapters.length) {
+      return;
+    }
+    final chapter = pack.chapters[_chapterNumber - 1];
+    if (verseNumber < 1 || verseNumber > chapter.verseCount) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Enter an ayah from 1 to ${chapter.verseCount}.')),
+      );
+      return;
+    }
+    _goToVerse(chapter.number, verseNumber);
+  }
+
+  void _navigateToMarker(
+    QuranTextPack pack,
+    bool Function(QuranVerse verse) matches,
+  ) {
+    for (final chapter in pack.chapters) {
+      for (final verse in chapter.verses) {
+        if (matches(verse)) {
+          _goToVerse(chapter.number, verse.verseNumber);
+          return;
+        }
+      }
+    }
   }
 
   void _reload() {
@@ -83,6 +158,43 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
         final selectedTranslation = translationIds.contains(_translationId)
             ? _translationId
             : null;
+        final pageNumbers = pack.chapters
+            .expand((item) => item.verses)
+            .map((verse) => verse.pageNumber)
+            .whereType<int>()
+            .toSet()
+            .toList()
+          ..sort();
+        final juzNumbers = pack.chapters
+            .expand((item) => item.verses)
+            .map((verse) => verse.juzNumber)
+            .whereType<int>()
+            .toSet()
+            .toList()
+          ..sort();
+        final hizbNumbers = pack.chapters
+            .expand((item) => item.verses)
+            .map((verse) => verse.hizbNumber)
+            .whereType<int>()
+            .toSet()
+            .toList()
+          ..sort();
+
+        if (_pendingVerseId != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted || _pendingVerseId == null) return;
+            final key = _verseKeys[_pendingVerseId!];
+            final targetContext = key?.currentContext;
+            if (targetContext != null) {
+              Scrollable.ensureVisible(
+                targetContext,
+                duration: const Duration(milliseconds: 250),
+                alignment: 0.1,
+              );
+            }
+            setState(() => _pendingVerseId = null);
+          });
+        }
 
         return Column(
           children: [
@@ -121,6 +233,38 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
                           }
                         },
                       ),
+                    ),
+                    if (pageNumbers.isNotEmpty)
+                      _MarkerDropdown(
+                        label: 'Page',
+                        values: pageNumbers,
+                        onSelected: (value) => _navigateToMarker(
+                          pack,
+                          (verse) => verse.pageNumber == value,
+                        ),
+                      ),
+                    if (juzNumbers.isNotEmpty)
+                      _MarkerDropdown(
+                        label: 'Juz',
+                        values: juzNumbers,
+                        onSelected: (value) => _navigateToMarker(
+                          pack,
+                          (verse) => verse.juzNumber == value,
+                        ),
+                      ),
+                    if (hizbNumbers.isNotEmpty)
+                      _MarkerDropdown(
+                        label: 'Hizb',
+                        values: hizbNumbers,
+                        onSelected: (value) => _navigateToMarker(
+                          pack,
+                          (verse) => verse.hizbNumber == value,
+                        ),
+                      ),
+                    OutlinedButton.icon(
+                      onPressed: _jumpToAyah,
+                      icon: const Icon(Icons.pin_drop_outlined),
+                      label: const Text('Go to ayah'),
                     ),
                     SegmentedButton<String>(
                       segments: const [
@@ -198,6 +342,7 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
                   final verse = chapter.verses[index];
                   final arabic = verse.textFor(_script);
                   return Column(
+                    key: _verseKeys.putIfAbsent(verse.id, () => GlobalKey()),
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Row(
@@ -250,6 +395,44 @@ class _QuranReaderPageState extends State<QuranReaderPage> {
           ],
         );
       },
+    );
+  }
+}
+
+class _MarkerDropdown extends StatelessWidget {
+  const _MarkerDropdown({
+    required this.label,
+    required this.values,
+    required this.onSelected,
+  });
+
+  final String label;
+  final List<int> values;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 110,
+      child: DropdownButtonFormField<int>(
+        value: null,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          isDense: true,
+        ),
+        hint: Text(label),
+        items: values
+            .map((value) => DropdownMenuItem<int>(
+                  value: value,
+                  child: Text('$value'),
+                ))
+            .toList(),
+        onChanged: (value) {
+          if (value != null) onSelected(value);
+        },
+      ),
     );
   }
 }
