@@ -57,6 +57,8 @@ TERMS OF USE:
 - This Quran text can be used in any website or application, provided that its source (Tanzil Project) is clearly indicated, and a link is made to tanzil.net to enable users to keep track of changes.
 
 Updates: https://tanzil.net/updates/
+
+Quran metadata (surah names, pages, juz and hizb-quarter boundaries): Tanzil Project, https://tanzil.net/res/text/metadata/quran-data.xml. Metadata version 1.0, copyright (C) 2008-2009 Tanzil.info, license CC BY.
 ''';
 
   /// Per-surah verse counts for the Tanzil version 1.1 Hafs text.
@@ -196,7 +198,10 @@ Updates: https://tanzil.net/updates/
     final result = <String, String>{};
     final lines = const LineSplitter().convert(source);
     for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-      final line = lines[lineIndex];
+      var line = lines[lineIndex];
+      if (lineIndex == 0 && line.startsWith('\uFEFF')) {
+        line = line.substring(1); // UTF-8 BOM is a file marker, not verse text.
+      }
       if (line.trim().isEmpty || line.startsWith('#')) continue;
       final firstSeparator = line.indexOf('|');
       final secondSeparator = firstSeparator < 0
@@ -266,6 +271,12 @@ Updates: https://tanzil.net/updates/
       final number = _intAttribute(element, 'index');
       if (number != index + 1) {
         throw TanzilImportException('Tanzil metadata has an invalid surah sequence.');
+      }
+      final metadataVerseCount = _intAttribute(element, 'ayas');
+      if (metadataVerseCount != verseCounts[index]) {
+        throw TanzilImportException(
+          'Tanzil metadata lists $metadataVerseCount ayahs for surah $number; expected ${verseCounts[index]}.',
+        );
       }
       chapters.add(
         _ChapterMetadata(
