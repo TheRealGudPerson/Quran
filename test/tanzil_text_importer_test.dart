@@ -21,7 +21,7 @@ String fixtureMetadata() {
   final chapters = <String>[];
   for (var chapter = 1; chapter <= 114; chapter++) {
     chapters.add(
-      '<sura index="$chapter" name="سورة $chapter" tname="Surah $chapter" ename="Chapter $chapter" type="Meccan" rukus="1" />',
+      '<sura index="$chapter" ayas="${TanzilTextImporter.verseCounts[chapter - 1]}" start="0" name="سورة $chapter" tname="Surah $chapter" ename="Chapter $chapter" type="Meccan" rukus="1" />',
     );
   }
   return '''
