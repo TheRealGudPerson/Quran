@@ -177,7 +177,7 @@ Quran metadata (surah names, pages, juz and hizb-quarter boundaries): Tanzil Pro
 
     // Validate the generated internal representation before it can be installed.
     QuranTextPack.fromJson(
-      payload,
+      jsonDecode(utf8.decode(payloadBytes)) as Map<String, dynamic>,
       expectedChapterCount: 114,
       expectedVerseCount: 6236,
     );
